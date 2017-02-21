@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+require_relative '../lib/polyglot'
+
+module Polyglot
+  class CLI < Thor
+    # TODO: Platform selection
+    # TODO: gcloud access token
+
+    desc 'translate', 'translates all the strings in the file'
+    method_option :file, required: true, type: :string, banner: 'file to translate'
+    method_option :targets, required: false, type: :array, banner: 'target languages'
+    def translate
+      path = File.expand_path(options[:file])
+      abort 'File not found!' unless File.exist?(path)
+      data = AndroidParser.new(file: path).parse
+      translations = Translate.new(targets: options[:targets]).translate(data)
+      XMLWriter.new(base_path: Dir.pwd).write(translations)
+    end
+
+    desc 'translate TEXT TARGET', 'translates the text'
+    def string(text, target)
+      translate = Translate.new
+      result = translate.request_translation(names: text, texts: text, target: target)
+      puts result
+    end
+  end
+
+  CLI.start(ARGV)
+end
