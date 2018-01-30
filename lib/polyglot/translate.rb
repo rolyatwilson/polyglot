@@ -21,7 +21,10 @@ module Polyglot
       targets.each do |target|
         results[target] = []
         c_index = 0
-        offset = 20
+
+        # GCloud "Currently, projects are limited to an API rate limit of 20 requests/second."
+        offset = 10
+        sleep 1
 
         while true do
           bound = c_index + offset - 1
